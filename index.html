@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/invoice.css">
+    <link rel="stylesheet" href="css/print.css" media="print">
+</head>
+<body>
+    <button id="mobile-menu-btn" class="mobile-toggle no-print">☰ Menu Form</button>
+    <div id="mobile-overlay" class="mobile-overlay no-print"></div>
+
+    <aside class="admin-panel no-print" id="admin-panel">
+        <h2>Invoice Builder</h2>
+        <hr>
+        <form id="invoice-form">
+            <div class="form-group">
+                <label>Nomor Invoice</label>
+                <input type="text" id="input-inv-no" class="form-control" placeholder="Contoh: INV/WH/..." maxlength="30">
+            </div>
+            
+            <div class="form-group">
+                <label>Customer Name</label>
+                <div class="d-flex" style="gap: 10px;">
+                    <select id="input-cust-title" class="form-control" style="width: 90px;">
+                        <option value="Mr.">Mr.</option>
+                        <option value="Mrs.">Mrs.</option>
+                        <option value="Ms.">Ms.</option>
+                        <option value="Bpk.">Bpk.</option>
+                        <option value="Ibu">Ibu</option>
+                        <option value="">(Tanpa)</option>
+                    </select>
+                    <input type="text" id="input-cust-name" class="form-control" placeholder="Nama Pelanggan Lengkap" maxlength="40">
+                </div>
+            </div>
+            
+            <hr>
+            <div class="d-flex-between">
+                <h3>Daftar Item Transaksi</h3>
+                <button type="button" class="btn-add" id="btn-add-item">+ Tambah Item</button>
+            </div>
+            
+            <div id="dynamic-items-list">
+                <div class="item-input-row">
+                    <div class="item-inputs">
+                        <textarea class="form-control input-item-desc" placeholder="Ketik deskripsi transaksi di sini...&#10;(Tekan Enter untuk baris baru)"></textarea>
+                        <input type="text" class="form-control input-item-amount" placeholder="Nominal (Rp)" oninput="formatInputRibuan(this)">
+                    </div>
+                    <button type="button" class="btn-delete" onclick="this.parentElement.remove(); updateInvoiceItems();">X</button>
+                </div>
+            </div>
+
+            <hr>
+            <div class="form-group">
+                <label>Tanggal Invoice (Kalender)</label>
+                <input type="date" id="input-date" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Issued By (Penandatangan)</label>
+                <input type="text" id="input-issuer" class="form-control" placeholder="Nama Penerbit Dokumen" maxlength="20">
+            </div>
+        </form>
+        <hr>
+        <button class="btn-print" onclick="window.print()">🖨 Print / PDF A4</button>
+    </aside>
+
+    <main class="preview-area">
+        <!-- HALAMAN 1: INVOICE -->
+        <div class="a4-paper page-break" id="invoice-preview">
+            <div class="header-row">
+                <div class="header-left">
+                    <img id="preview-logo" src="assets/logo/weholidaylogo.png" alt="WE HOLIDAY" class="logo-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iNTAiPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWVlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1zaXplPSIxNCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiPldFIEhPTElEQVk8L3RleHQ+PC9zdmc+'">
+                </div>
+                <div class="header-right">
+                    <div class="invoice-no" id="preview-inv-no"></div>
+                    <div class="receipt-title">TANDA TERIMA / RECEIPT</div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="office-info">
+                    <span class="office-label">Head Office :</span><br>
+                    MENARA BCA GRAND INDONESIA<br>
+                    Jl. MH Thamrin No.1, RT.1/RW.5, Kec. Menteng.<br>
+                    Kota Jakarta Pusat, Daerah Khusus Ibukota<br>
+                    Jakarta 10310,Indonesia
+                </div>
+                <div class="customer-info">
+                    <div class="customer-name-row">
+                        <span class="from-label">From :</span> <span class="customer-name" id="preview-cust-name"></span>
+                    </div>
+                    <div class="blue-lines">
+                        <div class="b-line"></div>
+                        <div class="b-line"></div>
+                        <div class="b-line"></div>
+                        <div class="b-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="col-desc-head">DESCRIPTION</div>
+                    <div class="col-amount-head">AMOUNT</div>
+                </div>
+                
+                <div class="table-body" id="preview-items-container">
+                    <!-- Item dinamis -->
+                </div>
+
+                <div class="table-footer">
+                    <div class="terbilang-box">
+                        <strong>TERBILANG :</strong><span id="preview-terbilang"></span>
+                    </div>
+                    <div class="total-label-box">TOTAL</div>
+                    <div class="total-value-box" id="preview-total"></div>
+                </div>
+            </div>
+
+            <div class="footer-row">
+                <div class="bank-details">
+                    BCA :<br>PT PROPERTI DUNIA INTERNASIONAL<br>Bank central Asia<br>1681552222
+                </div>
+                <div class="signature-section">
+                    <div class="date-text" id="preview-date"></div>
+                    
+                    <div class="stamp-sign-container">
+                        <img id="preview-meterai-img" src="assets/qr/e-materai.png" alt="E-Meterai" class="meterai-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2ZmY2NjYyIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSI+TUVURVJBSTwvdGV4dD48L3N2Zz4='">
+                        <div class="sign-column">
+                            <div class="issued-text">Issued by,</div>
+                            <img id="preview-sign-img" src="assets/signature/TTD.png" alt="Signature" class="sign-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idHJhbnNwYXJlbnQiLz48cGF0aCBkPSJNMTAgMzAgUSA0MCAxMCA3MCAzMCBUIDExMCAzMCIgc3Ryb2tlPSIjMDAwIiBmaWxsPSJub25lIi8+PC9zdmc+'">
+                            <div class="issuer-name" id="preview-issuer"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 2: SYARAT & KETENTUAN (BAGIAN 1) -->
+        <div class="a4-paper tc-page page-break">
+            <h2 class="tc-title">SYARAT & KETENTUAN TOUR</h2>
+            
+            <div class="tc-columns">
+                <div class="tc-section">
+                    <h4>PERSYARATAN & KONDISI UMUM</h4>
+                    <p>Biaya tour tidak mencakup hal-hal berikut:</p>
+                    <ul>
+                        <li>Biaya pembuatan document perjalanan: Passport, Visa, dll.</li>
+                        <li>Pengeluaran pribadi: mini bar, telepon, room service, cucian, makanan tambahan diluar dari menu yang disediakan dan pengeluaran pribadi lainnya.</li>
+                        <li>Tour tambahan (optional tour).</li>
+                        <li>Biaya bea masuk bagi barang-barang.</li>
+                        <li>Excess baggage (biaya kelebihan bagasi yang sudah ditentukan) yang dikenakan bea masuk oleh douane di Jakarta / negara-negara yang dikunjungi.</li>
+                        <li>Biaya single supplement bagi peserta yang menempati 1 kamar sendiri.</li>
+                        <li>Tips untuk lokal guide / Sopir / Porter hotel.</li>
+                        <li>Airport Tax, Asuransi perjalanan dan tax lainnya yang berlaku dinegara-negara / tempat yang dikunjungi.</li>
+                    </ul>
+                </div>
+
+                <div class="tc-section">
+                    <h4>PEMBATALAN</h4>
+                    <p><strong>a. Pembatalan oleh peserta:</strong></p>
+                    <ul>
+                        <li>30-15 hari dari tanggal keberangkatan: 50% dari harga tour.</li>
+                        <li>14 hari sebelum keberangkatan: 100% dari harga tour.</li>
+                    </ul>
+                    <p>Biaya pembatalan ini juga berlaku bagi peserta yang mengganti tanggal keberangkatan atau pindah ke jenis tour lain.</p>
+                    <p><strong>b. Pembatalan akibat imigrasi:</strong></p>
+                    <p>Pembatalan sebagian dari rangkaian acara paket tour akibat ketentuan pihak imigrasi (deportasi atau alasan lain, termasuk dokumen tidak memenuhi syarat) dikenakan 100% dari harga tour atau tidak ada refund.</p>
+                </div>
+
+                <div class="tc-section">
+                    <h4>TANGGUNG JAWAB</h4>
+                    <p>We-Holiday akan berusaha memberikan pelayanan terbaik. Namun, We-Holiday beserta agen perjalanan tidak bertanggung jawab atas:</p>
+                    <ul>
+                        <li>Kecelakaan, kehilangan atau keterlambatan bagasi oleh pihak maskapai, hotel, atau alat angkutan lainnya.</li>
+                        <li>Pelayanan yang tidak digunakan oleh peserta karena berhalangan atau sakit (tidak ada pengembalian).</li>
+                        <li>Kerugian waktu, perubahan acara, atau biaya tambahan akibat gangguan transportasi.</li>
+                        <li>Penghentian atau perubahan perjalanan transit.</li>
+                        <li>Sebab-sebab lain diluar kemampuan kami.</li>
+                        <li>Kehilangan barang pribadi, koper, atau tindakan kriminal selama perjalanan.</li>
+                        <li>Deportasi atau penolakan dari pihak imigrasi (tanpa pengembalian biaya).</li>
+                        <li>Perubahan perjalanan akibat bencana alam, perang, wabah, dan kondisi lainnya.</li>
+                    </ul>
+                </div>
+
+                <div class="tc-section">
+                    <h4>PERUBAHAN & PERPANJANGAN (Deviasi)</h4>
+                    <ul>
+                        <li>Deviasi diperbolehkan minimal 1 bulan sebelum keberangkatan (sebelum ticket dikeluarkan).</li>
+                        <li>Jika dilakukan setelah itu, biaya tambahan menjadi tanggung jawab peserta.</li>
+                        <li>Tidak ada pengembalian untuk pemangkasan jadwal tour.</li>
+                        <li>Perubahan tidak menjamin ketersediaan tiket/hotel.</li>
+                        <li>Jika hotel/airlines penuh, akan diganti dengan yang setaraf.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 3: SYARAT & KETENTUAN (BAGIAN 2) -->
+        <div class="a4-paper tc-page page-break">
+            <h2 class="tc-title" style="visibility: hidden;">SYARAT & KETENTUAN TOUR (Lanjutan)</h2>
+            
+            <div class="tc-columns">
+                <div class="tc-section">
+                    <h4>BIAYA TOUR TIDAK TERMASUK</h4>
+                    <p>Harga tour sewaktu-waktu dapat berubah tanpa pemberitahuan terlebih dahulu apabila terjadi perubahan kurs atau tarif penerbangan sebelum pelunasan.</p>
+                </div>
+
+                <div class="tc-section">
+                    <h4>PENDAFTARAN & PELUNASAN</h4>
+                    <ul>
+                        <li>Pendaftaran wajib menyertakan passport/copy passport dan uang muka.</li>
+                        <li>Pelunasan maksimal 14 hari sebelum keberangkatan.</li>
+                        <li>Pendaftaran H-15 wajib langsung lunas.</li>
+                        <li>We-Holiday berhak membatalkan peserta yang belum memenuhi pembayaran.</li>
+                        <li>Harga belum mengikat sebelum pelunasan.</li>
+                    </ul>
+                </div>
+
+                <div class="tc-section">
+                    <h4>VISA</h4>
+                    <ul>
+                        <li>Setiap kedutaan memiliki ketentuan berbeda terkait proses dan persyaratan visa.</li>
+                        <li>Aplikasi visa wajib melalui We-Holiday (kecuali negara tertentu).</li>
+                        <li>Peserta wajib melengkapi dokumen sesuai ketentuan kedutaan.</li>
+                        <li>Persetujuan visa sepenuhnya menjadi kewenangan kedutaan.</li>
+                        <li>Biaya visa tetap dibayar walaupun ditolak.</li>
+                        <li>Tidak ada refund jika terjadi deportasi/penolakan imigrasi.</li>
+                    </ul>
+                </div>
+
+                <div class="tc-section">
+                    <h4>TERMS AND CONDITIONS</h4>
+                    <ol>
+                        <li>Minimal keberangkatan 20 peserta.</li>
+                        <li>Uang Muka Pendaftaran tidak dapat dikembalikan (non-refundable) minimal IDR 20.000.000 + biaya visa (jika ada).</li>
+                        <li>Airport Tax, Fuel Surcharge, biaya visa, dan asuransi dapat berubah sewaktu-waktu.</li>
+                        <li>Peserta wajib memenuhi persyaratan visa sesuai ketentuan kedutaan.</li>
+                        <li>Keberangkatan sesuai minimum peserta.</li>
+                        <li>Jadwal perjalanan dapat berubah sesuai kondisi penerbangan/hotel.</li>
+                        <li>Force Majeur bersifat non-refundable.</li>
+                        <li>Pelunasan maksimal 14 hari sebelum keberangkatan.</li>
+                        <li>Deviasi dikenakan biaya sesuai ketentuan maskapai.</li>
+                        <li>Ketentuan pembatalan:<br>
+                            - Setelah pendaftaran: DP non-refundable<br>
+                            - 30-15 hari: 50%<br>
+                            - 14-06 hari: 75%<br>
+                            - 05 hari: 100%
+                        </li>
+                        <li>Dengan pembayaran, peserta dianggap menyetujui seluruh syarat & ketentuan.</li>
+                    </ol>
+                </div>
+
+                <div class="tc-section">
+                    <h4>KETENTUAN TAMBAHAN</h4>
+                    <ul>
+                        <li>Penyakit, aksi teroris, kerusuhan, dll termasuk Force Majeur.</li>
+                        <li>We-Holiday menyarankan asuransi perjalanan.</li>
+                        <li>Pihak penyelenggara berhak:<br>
+                            - Membatalkan/menunda keberangkatan jika peserta tidak memenuhi kuota.<br>
+                            - Mengubah rute atau jadwal perjalanan.<br>
+                            - Mengeluarkan peserta yang mengganggu jalannya tour.
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tc-section">
+                    <h4>PERMINTAAN KHUSUS</h4>
+                    <p>Permintaan khusus (makanan, kamar, kursi pesawat, dll) harus disampaikan saat reservasi dan tidak dijamin karena tergantung pihak ketiga.</p>
+                </div>
+
+                <div class="tc-section tc-consent">
+                    <h4>PERSETUJUAN</h4>
+                    <p>Dengan melakukan reservasi dan pembayaran deposit, peserta dianggap telah membaca, memahami, dan menyetujui seluruh syarat & ketentuan.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script src="js/app.js"></script>
+</body>
+</html>

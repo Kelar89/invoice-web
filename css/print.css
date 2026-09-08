@@ -1,0 +1,30 @@
+@page { size: A4 portrait; margin: 0; }
+@media print {
+    body { 
+        background: none !important; margin: 0 !important; padding: 0 !important; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+        color-adjust: exact !important;
+        display: block !important;
+        overflow: visible !important;
+    }
+    .no-print { display: none !important; }
+    
+    .preview-area { 
+        margin-left: 0 !important; 
+        padding: 0 !important; 
+        display: block !important; 
+    }
+    
+    .a4-paper { 
+        box-shadow: none !important; 
+        margin: 0 !important; 
+        width: 210mm !important; 
+        padding: 25mm 20mm !important; 
+        border: none !important;
+    }
+    
+    .page-break {
+        page-break-after: always !important; 
+    }
+}

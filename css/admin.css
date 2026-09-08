@@ -1,0 +1,72 @@
+* { box-sizing: border-box; }
+body {
+    margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #323639;
+}
+
+/* KOMPONEN MOBILE OFFCANVAS */
+.mobile-toggle {
+    display: none; position: fixed; top: 15px; left: 15px; z-index: 1000;
+    background: #0d6efd; color: white; border: none; padding: 10px 15px;
+    border-radius: 6px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.mobile-overlay {
+    display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5); z-index: 998; opacity: 0; transition: opacity 0.3s;
+}
+
+.admin-panel {
+    position: fixed; top: 0; left: 0; bottom: 0;
+    width: 380px; background-color: #ffffff; padding: 25px;
+    border-right: 1px solid #ddd; box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    overflow-y: auto; z-index: 999; transition: transform 0.3s ease;
+}
+.admin-panel h2, .admin-panel h3 { margin-top: 0; color: #333; font-size: 18px; }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 6px; color: #555; }
+.form-control {
+    width: 100%; padding: 10px; border: 1px solid #ccd0d5; border-radius: 6px;
+    font-size: 14px; transition: border-color 0.2s;
+}
+.form-control:focus { border-color: #0d6efd; outline: none; }
+.d-flex { display: flex; align-items: center; }
+
+textarea.form-control { resize: vertical; min-height: 65px; font-family: inherit; line-height: 1.4; }
+
+.d-flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.btn-add { background: #198754; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+.btn-add:hover { background: #157347; }
+.item-input-row { display: flex; gap: 8px; margin-bottom: 10px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px solid #dee2e6; align-items: center; }
+.item-inputs { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; }
+.btn-delete { background: #dc3545; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+.btn-delete:hover { background: #bb2d3b; }
+
+.btn-print {
+    padding: 12px 15px; background-color: #0d6efd; color: white; border: none;
+    border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;
+    font-size: 15px; margin-top: 10px;
+}
+.btn-print:hover { background-color: #0b5ed7; }
+
+.preview-area {
+    margin-left: 380px; padding: 40px; 
+    display: flex; flex-direction: column; align-items: center; gap: 30px;
+}
+
+/* PERBAIKAN RESPONSIVE MOBILE */
+@media screen and (max-width: 768px) {
+    .mobile-toggle { display: block; }
+    .admin-panel {
+        transform: translateX(-100%); width: 85%; max-width: 350px;
+    }
+    .admin-panel.open { transform: translateX(0); }
+    .mobile-overlay.open { display: block; opacity: 1; }
+    
+    .preview-area { 
+        margin-left: 0; 
+        padding: 70px 15px 20px 15px; 
+        align-items: flex-start; /* Mencegah sisi kiri terpotong */
+        overflow-x: auto; /* Mengizinkan geser ke samping */
+        width: 100vw;
+    }
+}
