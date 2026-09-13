@@ -20,8 +20,9 @@ const monthStr = String(today.getMonth() + 1).padStart(2, '0');
 const yearStr = today.getFullYear();
 const randomPuluhan = Math.floor(10 + Math.random() * 90); 
 
-const defaultInvoice = `INV/WH/${yearStr}${monthStr}${dayStr}/0${randomPuluhan}`;
-invNoInput.placeholder = defaultInvoice;
+// KETENTUAN: Default awalan We-
+const defaultInvoice = `We-${yearStr}${monthStr}${dayStr}-${randomPuluhan}`;
+invNoInput.value = defaultInvoice; 
 
 function updateInvoiceNo() {
     const val = invNoInput.value.trim() || invNoInput.placeholder;
@@ -54,6 +55,11 @@ function updateDocTitle() {
 
 const issuerInput = document.getElementById('input-issuer');
 const previewIssuer = document.getElementById('preview-issuer');
+
+// KETENTUAN: Default Issued By "Fabella"
+issuerInput.value = "Fabella";
+previewIssuer.textContent = "( Fabella )";
+
 issuerInput.addEventListener('input', (e) => {
     const val = e.target.value.trim();
     previewIssuer.textContent = val ? `( ${val} )` : "";
@@ -69,22 +75,31 @@ function updateDateStr() {
 }
 dateInput.addEventListener('change', updateDateStr);
 
+// MODIFIKASI: Memungkinkan input koma (,) untuk sen desimal USD
 function formatInputRibuan(input) {
-    let val = input.value.replace(/[^,\d]/g, ''); 
+    let val = input.value.replace(/[^0-9,]/g, ''); 
     if(val) {
-        input.value = parseInt(val, 10).toLocaleString('id-ID');
+        let parts = val.split(',');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        input.value = parts.join(',');
     } else {
         input.value = '';
     }
     updateInvoiceItems();
 }
 
-function formatRupiah(angka) {
+// FORMAT MATA UANG USD & IDR
+function formatCurrency(angka, currency) {
     if(angka === 0) return '';
+    if(currency === 'USD') {
+        return 'USD ' + angka.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
     return 'Rp ' + angka.toLocaleString('id-ID') + ',-';
 }
 
+// LOGIKA TERBILANG (Anti-Nol di Akhir)
 function angkaKeTerbilang(angka) {
+    if (angka === 0) return ""; 
     const bilangan = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
     let hasil = "";
     if (angka < 12) hasil = bilangan[angka];
@@ -107,14 +122,18 @@ const previewTerbilang = document.getElementById('preview-terbilang');
 
 function updateInvoiceItems() {
     const rows = document.querySelectorAll('.item-input-row');
+    const currencySelect = document.getElementById('input-currency');
+    const currency = currencySelect ? currencySelect.value : 'IDR';
+    
     let html = '';
     let grandTotal = 0;
 
     rows.forEach(row => {
         const desc = row.querySelector('.input-item-desc').value;
         const amtStr = row.querySelector('.input-item-amount').value;
-        const amtClean = amtStr.replace(/\./g, '');
-        const amt = parseInt(amtClean) || 0;
+        
+        const amtClean = amtStr.replace(/\./g, '').replace(',', '.');
+        const amt = parseFloat(amtClean) || 0;
 
         grandTotal += amt;
 
@@ -122,14 +141,32 @@ function updateInvoiceItems() {
             html += `
             <div class="preview-item-row">
                 <div class="preview-desc-cell">${desc.replace(/\n/g, '<br>')}</div>
-                <div class="preview-amount-cell">${formatRupiah(amt)}</div>
+                <div class="preview-amount-cell">${formatCurrency(amt, currency)}</div>
             </div>`;
         }
     });
 
     previewItemsContainer.innerHTML = html;
-    previewTotal.textContent = grandTotal > 0 ? formatRupiah(grandTotal) : "";
-    previewTerbilang.textContent = grandTotal > 0 ? angkaKeTerbilang(grandTotal) + " Rupiah" : "";
+    previewTotal.textContent = grandTotal > 0 ? formatCurrency(grandTotal, currency) : "";
+    
+    // Logika ejaan Terbilang Dolar
+    let terbilangStr = "";
+    if (grandTotal > 0) {
+        let intPart = Math.floor(grandTotal);
+        let decPart = Math.round((grandTotal - intPart) * 100);
+        
+        let textInt = intPart === 0 ? "Nol" : angkaKeTerbilang(intPart).replace(/\s+/g, ' ').trim();
+        
+        if (currency === 'USD') {
+            terbilangStr = textInt + " Dolar Amerika";
+            if (decPart > 0) {
+                terbilangStr += " " + angkaKeTerbilang(decPart).replace(/\s+/g, ' ').trim() + " Sen";
+            }
+        } else {
+            terbilangStr = textInt + " Rupiah";
+        }
+    }
+    previewTerbilang.textContent = terbilangStr.toUpperCase();
 }
 
 itemsContainer.addEventListener('input', function(e) {
@@ -144,7 +181,7 @@ btnAddItem.addEventListener('click', () => {
     newRow.innerHTML = `
         <div class="item-inputs">
             <textarea class="form-control input-item-desc" placeholder="Ketik deskripsi transaksi di sini...&#10;(Tekan Enter untuk baris baru)"></textarea>
-            <input type="text" class="form-control input-item-amount" placeholder="Nominal (Rp)" oninput="formatInputRibuan(this)">
+            <input type="text" class="form-control input-item-amount" placeholder="Nominal (Rp/USD)" oninput="formatInputRibuan(this)">
         </div>
         <button type="button" class="btn-delete" onclick="this.parentElement.remove(); updateInvoiceItems();">X</button>
     `;
@@ -152,8 +189,36 @@ btnAddItem.addEventListener('click', () => {
     updateInvoiceItems();
 });
 
+// FITUR ISI OTOMATIS
+document.getElementById('btn-auto-fill').addEventListener('click', () => {
+    if(!confirm("Isi otomatis data contoh?")) return;
+    document.getElementById('input-cust-title').value = "Mr.";
+    nameEl.value = "Henky";
+    
+    itemsContainer.innerHTML = "";
+    const dummyItems = [
+        {desc: "Adult Twin / Triple Share\n(7 Adult)", amt: "32.900.000"},
+        {desc: "Single Supplement\n(1 Pax)", amt: "13.000.000"}
+    ];
+    
+    dummyItems.forEach(item => {
+        const newRow = document.createElement('div');
+        newRow.className = 'item-input-row';
+        newRow.innerHTML = `
+            <div class="item-inputs">
+                <textarea class="form-control input-item-desc">${item.desc}</textarea>
+                <input type="text" class="form-control input-item-amount" value="${item.amt}" oninput="formatInputRibuan(this)">
+            </div>
+            <button type="button" class="btn-delete" onclick="this.parentElement.remove(); updateInvoiceItems();">X</button>
+        `;
+        itemsContainer.appendChild(newRow);
+    });
+    
+    updateCustName();
+    updateInvoiceItems();
+});
+
 updateInvoiceNo();
 updateCustName();
 updateDateStr();
 updateInvoiceItems();
-previewIssuer.textContent = "";

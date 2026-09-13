@@ -4,7 +4,6 @@ body {
     background-color: #323639;
 }
 
-/* KOMPONEN MOBILE OFFCANVAS */
 .mobile-toggle {
     display: none; position: fixed; top: 15px; left: 15px; z-index: 1000;
     background: #0d6efd; color: white; border: none; padding: 10px 15px;
@@ -53,7 +52,6 @@ textarea.form-control { resize: vertical; min-height: 65px; font-family: inherit
     display: flex; flex-direction: column; align-items: center; gap: 30px;
 }
 
-/* PERBAIKAN RESPONSIVE MOBILE */
 @media screen and (max-width: 768px) {
     .mobile-toggle { display: block; }
     .admin-panel {
@@ -65,8 +63,8 @@ textarea.form-control { resize: vertical; min-height: 65px; font-family: inherit
     .preview-area { 
         margin-left: 0; 
         padding: 70px 15px 20px 15px; 
-        align-items: flex-start; /* Mencegah sisi kiri terpotong */
-        overflow-x: auto; /* Mengizinkan geser ke samping */
+        align-items: flex-start;
+        overflow-x: auto;
         width: 100vw;
     }
 }
