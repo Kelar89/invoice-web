@@ -1,17 +1,13 @@
+/* STYLING UMUM & INVOICE */
 .a4-paper {
     background-color: white; width: 210mm; min-width: 210mm;
     padding: 25mm 20mm; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
     font-family: Arial, sans-serif; font-size: 13px; color: #000; position: relative;
     margin-bottom: 20px;
 }
-.page-break {
-    page-break-after: always;
-}
+.page-break { page-break-after: always; }
 
-#invoice-preview {
-    height: 297mm;
-    overflow: hidden;
-}
+#invoice-preview { height: 297mm; overflow: hidden; box-sizing: border-box; }
 
 .header-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; }
 .logo-img { height: 60px; object-fit: contain; max-width: 200px; }
@@ -42,7 +38,7 @@
 .table-body::after { content: ''; position: absolute; top: 0; bottom: 0; left: 75%; border-left: 1px solid #000; z-index: 0; }
 .preview-item-row { display: flex; width: 100%; margin-bottom: 8px; z-index: 1; }
 .preview-desc-cell { width: 75%; padding: 0 20px; text-align: center; font-size: 13px; line-height: 1.5; }
-.preview-amount-cell { width: 25%; padding: 0 20px; text-align: center; display: flex; align-items: center; justify-content: center; }
+.preview-amount-cell { width: 25%; padding: 0 20px; text-align: center; display: flex; align-items: center; justify-content: center; white-space: nowrap !important; }
 
 .table-footer { display: flex; border-left: 1px solid #000; border-right: 1px solid #000; border-bottom: 1px solid #000; font-size: 10px; height: 45px; overflow: hidden; }
 .terbilang-box { width: 65%; border-right: 1px solid #000; padding: 5px 10px; display: flex; align-items: center; }
@@ -50,18 +46,10 @@
 #preview-terbilang { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 9.5px; font-weight: bold; letter-spacing: 0px; line-height: 1.2; color: #111; }
 
 .total-label-box { width: 10%; border-right: 1px solid #000; padding: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; }
-.total-value-box { width: 25%; padding: 5px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; }
+.total-value-box { width: 25%; padding: 5px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; white-space: nowrap !important; }
 
 .footer-row { display: flex; justify-content: space-between; font-size: 12px; line-height: 1.5; margin-top: 15px; }
-
-/* PENAMBAHAN WARNA MERAH & MIRING UNTUK PEMBAYARAN */
-.bank-details { 
-    margin-top: 40px; 
-    color: #dc2626 !important; 
-    font-style: italic !important; 
-    font-family: 'Times New Roman', Times, serif !important; 
-    font-weight: bold !important; 
-}
+.bank-details { margin-top: 40px; color: #dc2626 !important; font-style: italic !important; font-family: 'Times New Roman', Times, serif !important; font-weight: bold !important; }
 @media print { .bank-details { color: #dc2626 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
 
 .signature-section { text-align: center; width: 280px; }
@@ -74,21 +62,95 @@
 .sign-img { width: 85px; height: 70px; object-fit: contain; mix-blend-mode: multiply; margin-bottom: 2px;}
 .issuer-name { font-weight: bold; font-size: 12px; margin-top: 0; text-align: center; width: 100%; }
 
-.tc-page {
-    padding: 20mm; font-size: 11px; line-height: 1.5;
-    height: 297mm; overflow: hidden;
-}
-.tc-title {
-    text-align: center; font-size: 16px; font-weight: bold;
-    margin-bottom: 25px; text-decoration: underline;
-}
+.tc-page { padding: 20mm; font-size: 11px; line-height: 1.5; height: 297mm; overflow: hidden; box-sizing: border-box; }
+.tc-title { text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 25px; text-decoration: underline; }
 .tc-columns { column-count: 2; column-gap: 25px; }
 .tc-section { margin-bottom: 20px; break-inside: avoid-column; }
-.tc-section h4 {
-    margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase;
-    color: #333; border-bottom: 1px solid #ccc; padding-bottom: 4px;
-}
+.tc-section h4 { margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
 .tc-section p, .tc-section ul, .tc-section ol { margin: 0 0 8px 0; text-align: justify; }
 .tc-section ul, .tc-section ol { padding-left: 18px; }
 .tc-section li { margin-bottom: 5px; }
-.tc-consent { background-color: #f9f9f9; padding: 12px; border: 1px dashed #333; margin-top: 25px; }
+
+/* =========================================================
+   STYLE KWITANSI PREMIUM - 1 HALAMAN LANDSCAPE MUTLAK
+========================================================= */
+.landscape-paper {
+    background-color: white; 
+    width: 297mm; height: 209mm; /* Dibatasi mutlak agar tidak tumpah ke page 2 */
+    padding: 12mm 15mm; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    font-family: Arial, sans-serif; font-size: 14px; color: #000; position: relative;
+    margin-bottom: 20px; box-sizing: border-box; overflow: hidden;
+}
+
+.kwt-box {
+    border: 2px solid #111; padding: 20px 30px; position: relative; background: #fff; 
+    height: 100%; box-sizing: border-box; 
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+
+/* KOP SURAT PROFESIONAL (Logo Kiri, Alamat Tengah) */
+.kwt-header-row {
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 15px;
+}
+.kwt-header-left { width: 25%; text-align: left; display: flex; align-items: center; }
+.logo-img-kwt { height: 50px; object-fit: contain; }
+
+.kwt-header-center-text { 
+    width: 50%; text-align: center; font-size: 11px; color: #333; line-height: 1.4; 
+}
+.kwt-header-right-empty { width: 25%; } /* Penyeimbang agar teks benar-benar di tengah */
+
+.kwt-header-title-bar {
+    width: 100%; display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; border-bottom: 2px solid #111; padding-bottom: 8px;
+}
+.kwt-title { font-size: 24px; font-weight: 900; margin: 0; letter-spacing: 3px; color: #111; }
+.kwt-no { font-size: 13px; font-weight: bold; }
+
+.kwt-body { font-size: 14px; line-height: 1.5; flex-grow: 1; }
+.kwt-row { display: flex; margin-bottom: 15px; align-items: flex-start; }
+.kwt-label { width: 170px; font-weight: bold; line-height: 1.2; flex-shrink: 0; color: #111; margin-top: 5px; }
+.kwt-sub { font-size: 11px; font-style: italic; font-weight: normal; color: #666; }
+.kwt-colon { width: 25px; text-align: center; font-weight: bold; margin-top: 5px; }
+
+.kwt-value-container { flex-grow: 1; padding-left: 10px; }
+.kwt-value {
+    border-bottom: 1px solid #111; padding-bottom: 2px; font-weight: bold; min-height: 22px; margin-top: 5px;
+}
+.kwt-value-address {
+    border-bottom: 1px solid #111; padding-bottom: 2px; font-size: 13px; font-weight: normal; min-height: 22px; margin-top: 5px; color: #333;
+}
+
+/* ARSIR & FONT MESIN TIK LX-300 UNTUK TERBILANG */
+.kwt-terbilang-box {
+    background: repeating-linear-gradient( -45deg, #ffffff, #ffffff 3px, #cbd5e1 3px, #cbd5e1 6px ) !important;
+    font-family: 'VT323', monospace !important; /* FONT LX-300 */
+    font-size: 23px !important; font-weight: normal !important;
+    border: 1px solid #94a3b8; border-radius: 3px; padding: 10px 15px; color: #111; width: 100%; display: flex; align-items: center; letter-spacing: 1px;
+}
+
+/* DAFTAR ITEM 1 BARIS NO-WRAP */
+.kwt-items-wrapper {
+    background: #fafafa; padding: 10px 15px; margin-top: 8px; border-left: 3px solid #ccc;
+}
+.kwt-item-row { 
+    display: flex; justify-content: space-between; border-bottom: 1px dotted #ccc; padding: 5px 0; font-size: 13px; 
+}
+.kwt-item-row:last-child { border-bottom: none; padding-bottom: 0; }
+.kwt-item-desc { width: 65%; line-height: 1.4; color: #222; }
+
+/* Nominal 1 Baris Sejajar & Font Mesin Tik */
+.kwt-item-amt { 
+    width: 35%; text-align: right; font-weight: bold; 
+    font-family: 'VT323', monospace !important; font-size: 18px !important; color: #111;
+    white-space: nowrap !important; /* MEMAKSA RP & ANGKA 1 BARIS */
+}
+
+.kwt-footer { display: flex; justify-content: space-between; margin-top: 15px; align-items: flex-end; }
+.kwt-amount-container { width: 45%; }
+.kwt-amount-box {
+    background: #111 !important; color: #fff !important; padding: 12px 25px; display: inline-block; border-radius: 6px; letter-spacing: 2px; 
+    font-family: 'VT323', monospace !important; font-size: 32px !important; font-weight: normal !important; box-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+    white-space: nowrap !important; /* MEMAKSA RP & ANGKA 1 BARIS */
+}

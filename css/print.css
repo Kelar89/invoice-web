@@ -1,4 +1,9 @@
-@page { size: A4 portrait; margin: 0; }
+/* Menghapus Header, Footer, URL, dan Jam dari Browser Mutlak */
+@page { 
+    margin: 0 !important; 
+    size: auto; 
+}
+
 @media print {
     body { 
         background: none !important; margin: 0 !important; padding: 0 !important; 
@@ -8,6 +13,10 @@
         display: block !important;
         overflow: visible !important;
     }
+    
+    /* MENGHILANGKAN TULISAN TANGGAL/JAM BAWAAN BROWSER */
+    @page { margin: 0 !important; } 
+
     .no-print { display: none !important; }
     
     .preview-area { 
@@ -16,15 +25,27 @@
         display: block !important; 
     }
     
-    .a4-paper { 
+    .a4-paper, .landscape-paper { 
         box-shadow: none !important; 
-        margin: 0 !important; 
-        width: 210mm !important; 
-        padding: 25mm 20mm !important; 
         border: none !important;
+        margin: 0 !important; 
     }
     
-    .page-break {
-        page-break-after: always !important; 
+    /* Lebar spesifik untuk print A4 Portrait */
+    .a4-paper { width: 210mm !important; padding: 25mm 20mm !important; }
+    
+    /* KUNCI: Tinggi dan Lebar mutlak untuk Kwitansi agar tidak tumpah ke halaman 2 */
+    .landscape-paper { 
+        width: 297mm !important; 
+        height: 209mm !important; 
+        max-height: 209mm !important; 
+        padding: 10mm !important; 
+        overflow: hidden !important; 
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
     }
+    
+    .kwt-box { height: 100% !important; }
+
+    .page-break { page-break-after: always !important; }
 }
